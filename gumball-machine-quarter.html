@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarter Gumball Game</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        #game-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            margin: 20px auto;
+            border: 2px solid #333;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .coin {
+            width: 80px;
+            height: 80px;
+            display: inline-block;
+            margin: 10px;
+            cursor: grab;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: transform 0.2s, opacity 0.3s;
+        }
+        .coin:hover {
+            transform: scale(1.1);
+        }
+        .coin:active {
+            cursor: grabbing;
+        }
+        #gumball-machine {
+            width: 600px;
+            height: 400px;
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-image: url('https://i.imgur.com/L3swSVO.png'); /* Gumball Machine Image */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        #gumball {
+            width: 50px;
+            height: 50px;
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-image: url('https://i.imgur.com/nWKRLQS.png'); /* Gumball Image */
+            background-size: contain;
+            background-repeat: no-repeat;
+            display: none;
+        }
+        #score {
+            font-size: 24px;
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pay $1.25 in quarters to get a gumball!</h1>
+    <div id="game-container">
+        <div id="gumball-machine" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        <div id="gumball"></div>
+    </div>
+    <div>
+        <div id="quarter1" class="coin quarter" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/F0DE7NZ.png');">
+        </div>
+        <div id="penny1" class="coin penny" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/96XmQBX.png');">
+        </div>
+        <div id="nickel1" class="coin nickel" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/jlP9y2D.png');">
+        </div>
+        <div id="dime1" class="coin dime" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/3fWNwhT.png');">
+        </div>
+        <div id="quarter2" class="coin quarter" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/F0DE7NZ.png');">
+        </div>
+        <div id="quarter3" class="coin quarter" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/F0DE7NZ.png');">
+        </div>
+        <div id="quarter4" class="coin quarter" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/F0DE7NZ.png');">
+        </div>
+        <div id="quarter5" class="coin quarter" draggable="true" ondragstart="drag(event)" 
+             style="background-image: url('https://i.imgur.com/F0DE7NZ.png');">
+        </div>
+    </div>
+    
+    <div id="score">Total: $0.00</div>
+    
+    <script>
+        let total = 0;
+        const quarterValue = 0.25;
+        const maxTotal = 1.25;
+
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+
+            if (total >= maxTotal) return;
+
+            let coinId = event.dataTransfer.getData("text");
+            let coin = document.getElementById(coinId);
+
+            if (coin.classList.contains("quarter")) {
+                coin.style.transition = "opacity 0.3s, transform 0.3s";
+                coin.style.transform = "scale(0.5) translateY(50px)";
+                coin.style.opacity = '0';
+
+                setTimeout(() => coin.remove(), 300);
+
+                total += quarterValue;
+                updateScore();
+                playDropSound();
+                checkGumballRelease();
+            } else {
+                coin.style.transition = "transform 0.3s";
+                coin.style.transform = "translateY(-10px)";
+                setTimeout(() => coin.style.transform = "translateY(0px)", 300);
+                playWrongSound();
+            }
+        }
+
+        function updateScore() {
+            document.getElementById("score").textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        function checkGumballRelease() {
+            if (total >= maxTotal) {
+                document.getElementById("gumball").style.display = "block";
+                playGumballSound();
+            }
+        }
+
+        function playDropSound() {
+            const audio = new Audio('https://raw.githubusercontent.com/silverflowerrose/coindropfile/main/coin-drop-82392.mp3');
+            audio.play();
+        }
+
+        function playWrongSound() {
+            const audio = new Audio('https://github.com/silverflowerrose/wronganswermp3/raw/refs/heads/main/wrong%20answer%20sound.mp3');
+            audio.play();
+        }
+
+        function playGumballSound() {
+            const audio = new Audio('https://github.com/silverflowerrose/gumball-sound/raw/refs/heads/main/item-pick-up-38258.mp3');
+            audio.play();
+        }
+    </script>
+</body>
+</html>
